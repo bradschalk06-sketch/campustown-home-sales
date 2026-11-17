@@ -1,31 +1,403 @@
 <!DOCTYPE html>
-<!-- A placeholder from the Home Sales template. Replace this file with your site's first page. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Under construction</title>
-  <!-- An empty icon, so the browser doesn't log an error looking for favicon.ico -->
-  <link rel="icon" href="data:,">
-  <style>
-    :root { color-scheme: light dark; }
-    body {
-      max-width: 40rem;
-      margin: 0 auto;
-      padding: 3rem 1rem;
-      font-family: system-ui, sans-serif;
-      line-height: 1.5;
-    }
-    footer { margin-top: 3rem; font-size: 0.875rem; opacity: 0.75; }
-  </style>
+  <title>Campus Housing Explorer | College-Town Home Sales</title>
+  <meta name="description" content="Interactive analysis of 35,442 home sales near 11 U.S. university campuses, with a spotlight on Champaign–Urbana.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b2545'/%3E%3Cpath d='M8 17l8-7 8 7v7h-5v-5h-6v5H8z' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <main>
-    <h1>This site is under construction</h1>
-    <p>It will show findings from the College-town home sales dataset.</p>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#overview" aria-label="Campus Housing Explorer home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="7"/><path d="M8 17l8-7 8 7v7h-5v-5h-6v5H8z"/></svg>
+        </span>
+        <span class="brand-text">Campus Housing <strong>Explorer</strong></span>
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <nav id="site-nav" class="nav">
+        <a href="#overview">Overview</a>
+        <a href="#universities">Universities</a>
+        <a href="#spotlight">Champaign–Urbana</a>
+        <a href="#explorer">Property Explorer</a>
+        <a href="#methodology">Methodology</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">College-town housing market research</p>
+      <h1>How do home prices compare across 11 university towns?</h1>
+      <p class="lede">
+        A data-driven look at <strong data-stat="hero-total">…</strong> recorded home sales in
+        <strong data-stat="hero-cities">…</strong> cities near <strong data-stat="hero-unis">…</strong>
+        university campuses, from <span data-stat="hero-from">…</span> to <span data-stat="hero-to">…</span>,
+        with a closer look at Champaign–Urbana, home of the University of Illinois.
+      </p>
+    </div>
+  </section>
+
+  <div id="loading" class="loading" role="status">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Loading 35,000+ home sales…</p>
+  </div>
+  <div id="load-error" class="load-error" hidden></div>
+
+  <main id="app" hidden>
+    <!-- 1. MARKET OVERVIEW -->
+    <section id="overview" class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">01 · Market overview</p>
+            <h2>Market snapshot</h2>
+            <p class="section-sub">Headline figures for the selected market. Change the filters to focus on one campus area or city.</p>
+          </div>
+          <div class="filters" role="group" aria-label="Overview filters">
+            <label class="field">
+              <span>University</span>
+              <select id="ov-university"></select>
+            </label>
+            <label class="field">
+              <span>City</span>
+              <select id="ov-city"></select>
+            </label>
+            <button id="ov-reset" class="btn btn-ghost" type="button">Reset</button>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <article class="kpi">
+            <h3>Home sales</h3>
+            <p class="kpi-value" id="kpi-sales">–</p>
+            <p class="kpi-note" id="kpi-sales-note"></p>
+          </article>
+          <article class="kpi">
+            <h3>Median sale price</h3>
+            <p class="kpi-value" id="kpi-price">–</p>
+            <p class="kpi-note" id="kpi-price-note"></p>
+          </article>
+          <article class="kpi">
+            <h3>Median price per sq ft</h3>
+            <p class="kpi-value" id="kpi-ppsf">–</p>
+            <p class="kpi-note" id="kpi-ppsf-note"></p>
+          </article>
+          <article class="kpi">
+            <h3>Median days on market</h3>
+            <p class="kpi-value" id="kpi-dom">–</p>
+            <p class="kpi-note" id="kpi-dom-note"></p>
+          </article>
+        </div>
+
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-head">
+              <h3>Sales and median price by month</h3>
+              <p class="card-sub">Month of closing. The first and last months are partial: the data runs <span data-stat="hero-from">…</span> to <span data-stat="hero-to">…</span>.</p>
+            </div>
+            <div class="chart-box"><canvas id="chart-trend" aria-label="Monthly sales count and median sale price"></canvas></div>
+          </article>
+          <article class="card">
+            <div class="card-head">
+              <h3>Sale price distribution</h3>
+              <p class="card-sub">Share of sales in each $100,000 band. Sales of $1.5 million or more are grouped in the last bar.</p>
+            </div>
+            <div class="chart-box"><canvas id="chart-dist" aria-label="Distribution of sale prices"></canvas></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. UNIVERSITY COMPARISON -->
+    <section id="universities" class="section section-alt">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">02 · University market comparison</p>
+            <h2>Eleven campus markets, side by side</h2>
+            <p class="section-sub">Each sale is assigned to its nearest campus by coordinates. The University of Illinois Urbana-Champaign is highlighted in <span class="swatch swatch-orange"></span> orange.</p>
+          </div>
+          <div class="segmented" role="tablist" aria-label="Metric for university chart" id="uni-metric">
+            <button role="tab" aria-selected="true" data-metric="medianPrice">Median price</button>
+            <button role="tab" aria-selected="false" data-metric="medianPpsf">$ / sq ft</button>
+            <button role="tab" aria-selected="false" data-metric="medianDom">Days on market</button>
+            <button role="tab" aria-selected="false" data-metric="medianSqft">Home size</button>
+          </div>
+        </div>
+
+        <div class="grid-2 grid-wide-left">
+          <article class="card">
+            <div class="card-head">
+              <h3 id="uni-chart-title">Median sale price by campus area</h3>
+              <p class="card-sub" id="uni-chart-sub">Ranked from highest to lowest. Hover a bar for details.</p>
+            </div>
+            <div class="chart-box chart-tall"><canvas id="chart-uni" aria-label="University comparison chart"></canvas></div>
+          </article>
+          <article class="card">
+            <div class="card-head">
+              <h3>Sales volume</h3>
+              <p class="card-sub">Number of sales in the analysis set, by campus area.</p>
+            </div>
+            <div class="chart-box chart-tall"><canvas id="chart-uni-volume" aria-label="Sales volume by university"></canvas></div>
+          </article>
+        </div>
+
+        <article class="card">
+          <div class="card-head">
+            <h3>Campus area scorecard</h3>
+            <p class="card-sub">Click a column heading to sort.</p>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="uni-table">
+              <thead>
+                <tr>
+                  <th data-key="name" class="text">University</th>
+                  <th data-key="sales">Sales</th>
+                  <th data-key="medianPrice">Median price</th>
+                  <th data-key="medianPpsf">Median $/sq ft</th>
+                  <th data-key="medianSqft">Median sq ft</th>
+                  <th data-key="medianDom">Median days on market</th>
+                  <th data-key="domCoverage">DOM coverage</th>
+                  <th data-key="medianMiles">Median miles to campus</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 3. CHAMPAIGN-URBANA SPOTLIGHT -->
+    <section id="spotlight" class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">03 · Champaign–Urbana spotlight</p>
+            <h2>Champaign, Urbana and Savoy</h2>
+            <p class="section-sub" id="cu-summary">…</p>
+          </div>
+        </div>
+
+        <div class="city-cards" id="cu-cards"></div>
+
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-head">
+              <h3>Champaign–Urbana cities compared</h3>
+              <p class="card-sub">Median sale price (bars) and median price per square foot (line).</p>
+            </div>
+            <div class="chart-box"><canvas id="chart-cu" aria-label="Champaign, Urbana and Savoy comparison"></canvas></div>
+          </article>
+          <article class="card">
+            <div class="card-head">
+              <h3>Days on market in Champaign–Urbana</h3>
+              <p class="card-sub">Share of listed sales that went under contract within each time window.</p>
+            </div>
+            <div class="chart-box"><canvas id="chart-cu-dom" aria-label="Days on market distribution for Champaign, Urbana and Savoy"></canvas></div>
+          </article>
+        </div>
+
+        <article class="card">
+          <div class="card-head card-head-row">
+            <div>
+              <h3>How Champaign–Urbana compares with other college towns</h3>
+              <p class="card-sub">All 18 cities in the dataset. Champaign, Urbana and Savoy are highlighted.</p>
+            </div>
+            <div class="segmented segmented-sm" role="tablist" aria-label="Metric for city chart" id="city-metric">
+              <button role="tab" aria-selected="true" data-metric="medianPrice">Median price</button>
+              <button role="tab" aria-selected="false" data-metric="medianPpsf">$ / sq ft</button>
+              <button role="tab" aria-selected="false" data-metric="sales">Sales</button>
+            </div>
+          </div>
+          <div class="chart-box chart-xtall"><canvas id="chart-cities" aria-label="City comparison chart"></canvas></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. PROPERTY EXPLORER -->
+    <section id="explorer" class="section section-alt">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">04 · Property explorer</p>
+            <h2>Search individual home sales</h2>
+            <p class="section-sub">Every row is a recorded sale, shown exactly as it appears in the dataset. A dash (—) means the value is missing from the source.</p>
+          </div>
+        </div>
+
+        <article class="card explorer-card">
+          <form class="explorer-filters" id="ex-form" onsubmit="return false">
+            <label class="field field-wide">
+              <span>Search address, ZIP or listing ID</span>
+              <input type="search" id="ex-search" placeholder="e.g. Green St or 61820" autocomplete="off">
+            </label>
+            <label class="field">
+              <span>University</span>
+              <select id="ex-university"></select>
+            </label>
+            <label class="field">
+              <span>City</span>
+              <select id="ex-city"></select>
+            </label>
+            <label class="field">
+              <span>Min price</span>
+              <input type="number" id="ex-min" inputmode="numeric" min="0" step="10000" placeholder="No min">
+            </label>
+            <label class="field">
+              <span>Max price</span>
+              <input type="number" id="ex-max" inputmode="numeric" min="0" step="10000" placeholder="No max">
+            </label>
+            <label class="field">
+              <span>Bedrooms</span>
+              <select id="ex-beds">
+                <option value="">Any</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5+">5 or more</option>
+              </select>
+            </label>
+            <label class="field field-range">
+              <span>Max distance to campus: <strong id="ex-miles-label">Any</strong></span>
+              <input type="range" id="ex-miles" min="0.5" max="15.5" step="0.5" value="15.5">
+            </label>
+            <label class="field">
+              <span>Sort by</span>
+              <select id="ex-sort">
+                <option value="sale_price:desc">Price: high to low</option>
+                <option value="sale_price:asc">Price: low to high</option>
+                <option value="ppsf:desc">$/sq ft: high to low</option>
+                <option value="ppsf:asc">$/sq ft: low to high</option>
+                <option value="sale_date:desc">Sale date: newest</option>
+                <option value="sale_date:asc">Sale date: oldest</option>
+                <option value="living_area_sqft:desc">Size: largest</option>
+                <option value="miles_to_campus:asc">Distance: closest</option>
+                <option value="dom:asc">Days on market: fewest</option>
+                <option value="dom:desc">Days on market: most</option>
+              </select>
+            </label>
+            <label class="check">
+              <input type="checkbox" id="ex-include-excluded">
+              <span>Include sales outside the price rule</span>
+            </label>
+            <div class="explorer-actions">
+              <button type="button" class="btn btn-ghost" id="ex-reset">Reset filters</button>
+              <button type="button" class="btn btn-primary" id="ex-download">Download results (CSV)</button>
+            </div>
+          </form>
+
+          <div class="explorer-summary" id="ex-summary" aria-live="polite"></div>
+
+          <div class="table-scroll">
+            <table class="data-table explorer-table" id="ex-table">
+              <thead>
+                <tr>
+                  <th data-sort="address_street" class="text">Address</th>
+                  <th data-sort="city" class="text">City</th>
+                  <th data-sort="university" class="text">University</th>
+                  <th data-sort="sale_date">Sale date</th>
+                  <th data-sort="sale_price">Sale price</th>
+                  <th data-sort="beds">Beds</th>
+                  <th data-sort="baths">Baths</th>
+                  <th data-sort="living_area_sqft">Sq ft</th>
+                  <th data-sort="ppsf">$/sq ft</th>
+                  <th data-sort="year_built">Built</th>
+                  <th data-sort="miles_to_campus">Miles</th>
+                  <th data-sort="dom">Days on market</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="pager" id="ex-pager">
+            <button type="button" class="btn btn-ghost" id="ex-prev">← Previous</button>
+            <span id="ex-page"></span>
+            <button type="button" class="btn btn-ghost" id="ex-next">Next →</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 5. METHODOLOGY -->
+    <section id="methodology" class="section">
+      <div class="wrap narrow">
+        <p class="eyebrow">05 · Methodology</p>
+        <h2>How the numbers are calculated</h2>
+        <p>Every figure on this site is computed in your browser from <code>data/site_sales.csv</code>, which contains all
+          <span data-stat="m-total">…</span> rows of the original dataset (<code>data/college_town_home_sales.csv</code>)
+          with only the columns the site needs. No numbers are typed in by hand. Medians use the middle value
+          (or the average of the two middle values when the count is even).</p>
+
+        <div class="method-grid">
+          <article class="method">
+            <h3>Price rule</h3>
+            <p>Sales below <strong>$10,000</strong> or above <strong>$5,000,000</strong> are treated as implausible and
+              left out of every statistic and chart: <span data-stat="m-low">…</span> sales under $10,000 and
+              <span data-stat="m-high">…</span> over $5,000,000. That leaves an analysis set of
+              <strong data-stat="m-valid">…</strong> sales. The explorer can still show the excluded rows.</p>
+          </article>
+          <article class="method">
+            <h3>Price per square foot</h3>
+            <p>Sale price divided by finished living area, only where living area is recorded and greater than
+              zero. <span data-stat="m-sqft-missing">…</span> rows have no living area and
+              <span data-stat="m-sqft-zero">…</span> report 0, so price per square foot uses
+              <strong data-stat="m-ppsf">…</strong> sales.</p>
+          </article>
+          <article class="method">
+            <h3>Days on market</h3>
+            <p><strong>Contract date minus list date</strong>, the way listing services count it, not the closing date.
+              A missing date is never counted as zero: the figure uses only the <strong data-stat="m-dom">…</strong>
+              sales in the analysis set that have both dates (<span data-stat="m-dom-pct">…</span>). Homes sold without
+              a listing, often new construction, are not represented, so coverage is shown beside each figure.</p>
+          </article>
+          <article class="method">
+            <h3>Identifiers and duplicates</h3>
+            <p><code>listing_id</code> is the unique key (<span data-stat="m-ids">…</span> unique ids for
+              <span data-stat="m-total">…</span> rows). Nothing is deduplicated by street address: separate condo units
+              in one building share an address and are distinct sales. ZIP codes are read as text.</p>
+          </article>
+          <article class="method">
+            <h3>Property type</h3>
+            <p>The source's <code>home_type</code> field labels nearly every row single family, including condo units,
+              so it is not used anywhere on this site.</p>
+          </article>
+          <article class="method">
+            <h3>Campus areas</h3>
+            <p>Each sale belongs to the nearest of 11 campus landmarks, by its own coordinates.
+              <code>miles_to_campus</code> is straight-line distance. Champaign, Urbana and Savoy make up the University
+              of Illinois area.</p>
+          </article>
+        </div>
+
+        <div class="callout">
+          <h3>Data source and citation</h3>
+          <p>College-town home sales dataset, version 1.0 (2026). University of Illinois-Deloitte Foundation Center for
+            Business Emerging Technologies. Data collected March 2026.</p>
+          <p class="muted">Values are as reported by the collection source and have not been verified against county
+            records. See the project's <a href="https://github.com/bradschalk06-sketch/campustown-home-sales#readme">README</a>
+            for the full methodology and independent checks of the figures.</p>
+        </div>
+      </div>
+    </section>
   </main>
-  <footer>
-    <p>Data: College-town home sales dataset, version 1.0 (2026). University of Illinois-Deloitte Foundation Center for Business Emerging Technologies. Data collected March 2026.</p>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <p><strong>Campus Housing Explorer</strong> · A college-town housing market dashboard</p>
+      <p class="muted">Data: College-town home sales dataset v1.0 (2026), UIDFC Center for Business Emerging Technologies.
+        Charts: Chart.js. CSV parsing: Papa Parse.</p>
+    </div>
   </footer>
+
+  <script src="vendor/papaparse.min.js"></script>
+  <script src="vendor/chart.umd.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
