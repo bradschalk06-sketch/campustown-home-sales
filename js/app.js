@@ -148,7 +148,7 @@
     $("#loading").hidden = true;
     const box = $("#load-error");
     box.hidden = false;
-    box.innerHTML = "<strong>The data could not be loaded.</strong> Please refresh the page. <br><small>" +
+    box.innerHTML = "<strong>The market data could not be loaded.</strong> Refreshing the page may resolve the issue. <br><small>" +
       escapeHtml(e && e.message ? e.message : String(e)) + "</small>";
   }
 
@@ -255,7 +255,7 @@
     setStat("m-ppsf", fmtInt(VALID.filter((r) => r.ppsf != null).length));
     const domN = VALID.filter((r) => r.dom != null).length;
     setStat("m-dom", fmtInt(domN));
-    setStat("m-dom-pct", fmtPct(domN / VALID.length) + " of the analysis set");
+    setStat("m-dom-pct", fmtPct(domN / VALID.length) + " of analyzed sales");
     setStat("m-ids", fmtInt(unique(ALL.map((r) => r.listing_id)).length));
   }
 
@@ -323,14 +323,14 @@
 
     $("#kpi-sales").textContent = fmtInt(s.sales);
     $("#kpi-sales-note").textContent = excluded
-      ? `${fmtInt(recorded.length)} recorded; ${fmtInt(excluded)} outside the $10K–$5M price rule`
-      : `${fmtInt(recorded.length)} recorded; none outside the price rule`;
+      ? `Of ${fmtInt(recorded.length)} recorded; ${fmtInt(excluded)} outside the $10K–$5M analysis range`
+      : `Of ${fmtInt(recorded.length)} recorded; none outside the analysis range`;
     $("#kpi-price").textContent = fmtMoney(s.medianPrice);
-    $("#kpi-price-note").textContent = `Middle sale of ${fmtInt(s.sales)}`;
+    $("#kpi-price-note").textContent = `Based on ${fmtInt(s.sales)} sales`;
     $("#kpi-ppsf").textContent = s.medianPpsf == null ? "—" : fmtMoney(s.medianPpsf);
-    $("#kpi-ppsf-note").textContent = `${fmtInt(s.ppsfN)} sales with living area recorded`;
+    $("#kpi-ppsf-note").textContent = `Based on ${fmtInt(s.ppsfN)} sales with reported living area`;
     $("#kpi-dom").textContent = s.medianDom == null ? "—" : fmtDays(s.medianDom);
-    $("#kpi-dom-note").textContent = `List to contract · ${fmtInt(s.domN)} sales with both dates (${fmtPct(s.domCoverage, 0)})`;
+    $("#kpi-dom-note").textContent = `Listing to contract · ${fmtInt(s.domN)} sales with both dates (${fmtPct(s.domCoverage, 0)})`;
 
     // Monthly trend (rows without a sale date cannot be placed in a month)
     const byMonth = groupBy(rows.filter((r) => r.sale_date), (r) => r.sale_date.slice(0, 7));
@@ -371,9 +371,9 @@
   // ---------------------------------------------------------------------------
   let UNI_STATS = [];
   const UNI_METRICS = {
-    medianPrice: { title: "Median sale price by campus area", fmt: fmtMoney, axis: fmtMoneyShort, sub: "Ranked from highest to lowest. Hover a bar for details." },
-    medianPpsf: { title: "Median price per square foot by campus area", fmt: fmtMoney, axis: (v) => "$" + v, sub: "Sales with living area recorded and above zero." },
-    medianDom: { title: "Median days on market by campus area", fmt: fmtDays, axis: (v) => v + "d", sub: "List date to contract date, sales with both dates only." },
+    medianPrice: { title: "Median sale price by campus area", fmt: fmtMoney, axis: fmtMoneyShort, sub: "Ranked from highest to lowest, with sales counts shown on hover." },
+    medianPpsf: { title: "Median price per square foot by campus area", fmt: fmtMoney, axis: (v) => "$" + v, sub: "Based on sales with reported living area greater than zero." },
+    medianDom: { title: "Median days on market by campus area", fmt: fmtDays, axis: (v) => v + "d", sub: "Listing date to contract date, for sales with both dates reported." },
     medianSqft: { title: "Median home size by campus area", fmt: (v) => fmtInt(v) + " sq ft", axis: (v) => fmtInt(v), sub: "Finished living area in square feet." },
   };
 
@@ -414,7 +414,7 @@
     const d = UNI_STATS.find((x) => x.name === c.dataset.full[c.dataIndex]);
     const lines = [` ${UNI_METRICS[uniMetric].fmt(c.raw)}`, ` ${fmtInt(d.sales)} sales`];
     if (uniMetric === "medianDom") lines.push(` Based on ${fmtInt(d.domN)} sales with both dates (${fmtPct(d.domCoverage, 0)})`);
-    if (uniMetric === "medianPpsf") lines.push(` Based on ${fmtInt(d.ppsfN)} sales with living area`);
+    if (uniMetric === "medianPpsf") lines.push(` Based on ${fmtInt(d.ppsfN)} sales with reported living area`);
     return lines;
   }
 
@@ -674,8 +674,8 @@
     $("#ex-summary").innerHTML = ex.results.length
       ? `<strong>${fmtInt(ex.results.length)}</strong> matching sales · median price <strong>${fmtMoney(med)}</strong>` +
         ` · median $/sq ft <strong>${fmtMoney(median(valid.map((r) => r.ppsf)))}</strong>` +
-        (excludedShown ? ` · includes ${fmtInt(excludedShown)} outside the price rule (not in the medians)` : "")
-      : "No sales match these filters. Try widening the price range or distance.";
+        (excludedShown ? ` · includes ${fmtInt(excludedShown)} outside the analysis range, which are not reflected in the medians` : "")
+      : "No sales match the selected criteria. Broader price or distance limits return more results.";
     renderExplorerPage();
   }
 
@@ -685,7 +685,7 @@
     const cell = (label, v, text) => (v == null ? `<td class="na" data-label="${label}">—</td>` : `<td data-label="${label}">${text}</td>`);
     $("#ex-table tbody").innerHTML = page.map((r) => `
       <tr>
-        <td class="text cell-address" data-label="Address" title="${escapeHtml(r.address_street)} · listing ${escapeHtml(r.listing_id)}">${escapeHtml(r.address_street)}${r.valid ? "" : '<span class="tag">Outside price rule</span>'}</td>
+        <td class="text cell-address" data-label="Address" title="${escapeHtml(r.address_street)} · listing ${escapeHtml(r.listing_id)}">${escapeHtml(r.address_street)}${r.valid ? "" : '<span class="tag">Outside analysis range</span>'}</td>
         <td class="text" data-label="City">${escapeHtml(r.city)}, ${escapeHtml(r.state)} ${escapeHtml(r.zipcode || "")}</td>
         <td class="text" data-label="University">${escapeHtml(shortUni(r.university))}</td>
         ${cell("Sale date", r.sale_date, fmtDate(r.sale_date))}

@@ -55,7 +55,7 @@
           <div>
             <p class="eyebrow">01 · Market overview</p>
             <h2>Market snapshot</h2>
-            <p class="section-sub">Headline figures for the selected market. Change the filters to focus on one campus area or city.</p>
+            <p class="section-sub">Headline indicators for the selected market. Figures update to reflect the university and city selected.</p>
           </div>
           <div class="filters" role="group" aria-label="Overview filters">
             <label class="field">
@@ -97,7 +97,7 @@
           <article class="card">
             <div class="card-head">
               <h3>Sales and median price by month</h3>
-              <p class="card-sub">Month of closing. The first and last months are partial: the data runs <span data-stat="hero-from">…</span> to <span data-stat="hero-to">…</span>.</p>
+              <p class="card-sub">Sales by month of closing. The first and last months are partial, as the data covers <span data-stat="hero-from">…</span> to <span data-stat="hero-to">…</span>.</p>
             </div>
             <div class="chart-box"><canvas id="chart-trend" aria-label="Monthly sales count and median sale price"></canvas></div>
           </article>
@@ -133,14 +133,14 @@
           <article class="card">
             <div class="card-head">
               <h3 id="uni-chart-title">Median sale price by campus area</h3>
-              <p class="card-sub" id="uni-chart-sub">Ranked from highest to lowest. Hover a bar for details.</p>
+              <p class="card-sub" id="uni-chart-sub">Ranked from highest to lowest, with sales counts shown on hover.</p>
             </div>
             <div class="chart-box chart-tall"><canvas id="chart-uni" aria-label="University comparison chart"></canvas></div>
           </article>
           <article class="card">
             <div class="card-head">
               <h3>Sales volume</h3>
-              <p class="card-sub">Number of sales in the analysis set, by campus area.</p>
+              <p class="card-sub">Number of sales within the analysis price range, by campus area.</p>
             </div>
             <div class="chart-box chart-tall"><canvas id="chart-uni-volume" aria-label="Sales volume by university"></canvas></div>
           </article>
@@ -149,7 +149,7 @@
         <article class="card">
           <div class="card-head">
             <h3>Campus area scorecard</h3>
-            <p class="card-sub">Click a column heading to sort.</p>
+            <p class="card-sub">Key indicators for each campus area. Columns are sortable.</p>
           </div>
           <div class="table-scroll">
             <table class="data-table" id="uni-table">
@@ -161,7 +161,7 @@
                   <th data-key="medianPpsf">Median $/sq ft</th>
                   <th data-key="medianSqft">Median sq ft</th>
                   <th data-key="medianDom">Median days on market</th>
-                  <th data-key="domCoverage">DOM coverage</th>
+                  <th data-key="domCoverage">Days-on-market coverage</th>
                   <th data-key="medianMiles">Median miles to campus</th>
                 </tr>
               </thead>
@@ -225,15 +225,15 @@
         <div class="section-head">
           <div>
             <p class="eyebrow">04 · Property explorer</p>
-            <h2>Search individual home sales</h2>
-            <p class="section-sub">Every row is a recorded sale, shown exactly as it appears in the dataset. A dash (—) means the value is missing from the source.</p>
+            <h2>Individual home sales</h2>
+            <p class="section-sub">Each record is a completed sale, presented as reported in the source data. A dash (—) indicates a value that was not reported.</p>
           </div>
         </div>
 
         <article class="card explorer-card">
           <form class="explorer-filters" id="ex-form" onsubmit="return false">
             <label class="field field-wide">
-              <span>Search address, ZIP or listing ID</span>
+              <span>Address, ZIP code or listing ID</span>
               <input type="search" id="ex-search" placeholder="e.g. Green St or 61820" autocomplete="off">
             </label>
             <label class="field">
@@ -284,7 +284,7 @@
             </label>
             <label class="check">
               <input type="checkbox" id="ex-include-excluded">
-              <span>Include sales outside the price rule</span>
+              <span>Include sales outside the $10,000–$5,000,000 analysis range</span>
             </label>
             <div class="explorer-actions">
               <button type="button" class="btn btn-ghost" id="ex-reset">Reset filters</button>
@@ -329,50 +329,55 @@
     <section id="methodology" class="section">
       <div class="wrap narrow">
         <p class="eyebrow">05 · Methodology</p>
-        <h2>How the numbers are calculated</h2>
-        <p>Every figure on this site is computed in your browser from <code>data/site_sales.csv</code>, which contains all
-          <span data-stat="m-total">…</span> rows of the original dataset (<code>data/college_town_home_sales.csv</code>)
-          with only the columns the site needs. No numbers are typed in by hand. Medians use the middle value
-          (or the average of the two middle values when the count is even).</p>
+        <h2>About the data and methods</h2>
+        <p>The figures in this report are drawn from the College-town Home Sales dataset, version 1.0, which records
+          <span data-stat="m-total">…</span> completed home sales near 11 university campuses between
+          <span data-stat="hero-from">…</span> and <span data-stat="hero-to">…</span>. All statistics are calculated
+          directly from these records. Medians are reported rather than averages because home prices and selling times
+          are skewed by a small number of very high values; where a group contains an even number of sales, the median is
+          the average of the two middle values.</p>
 
         <div class="method-grid">
           <article class="method">
-            <h3>Price rule</h3>
-            <p>Sales below <strong>$10,000</strong> or above <strong>$5,000,000</strong> are treated as implausible and
-              left out of every statistic and chart: <span data-stat="m-low">…</span> sales under $10,000 and
-              <span data-stat="m-high">…</span> over $5,000,000. That leaves an analysis set of
-              <strong data-stat="m-valid">…</strong> sales. The explorer can still show the excluded rows.</p>
+            <h3>Price range</h3>
+            <p>The analysis is limited to sales between <strong>$10,000</strong> and <strong>$5,000,000</strong>. This range
+              is an analytical choice that keeps extreme recorded prices, which run from $0 to more than $80 million, from
+              distorting market comparisons; it does not imply that the excluded transactions are invalid. The range
+              excludes <span data-stat="m-low">…</span> sales below $10,000 and <span data-stat="m-high">…</span> above
+              $5,000,000, leaving <strong data-stat="m-valid">…</strong> sales in the analysis. Excluded sales
+              remain available in the Property Explorer.</p>
           </article>
           <article class="method">
             <h3>Price per square foot</h3>
-            <p>Sale price divided by finished living area, only where living area is recorded and greater than
-              zero. <span data-stat="m-sqft-missing">…</span> rows have no living area and
-              <span data-stat="m-sqft-zero">…</span> report 0, so price per square foot uses
+            <p>Sale price divided by finished living area, calculated only where living area is reported and greater than
+              zero. <span data-stat="m-sqft-missing">…</span> sales have no reported living area and
+              <span data-stat="m-sqft-zero">…</span> report zero, so price per square foot is based on
               <strong data-stat="m-ppsf">…</strong> sales.</p>
           </article>
           <article class="method">
             <h3>Days on market</h3>
-            <p><strong>Contract date minus list date</strong>, the way listing services count it, not the closing date.
-              A missing date is never counted as zero: the figure uses only the <strong data-stat="m-dom">…</strong>
-              sales in the analysis set that have both dates (<span data-stat="m-dom-pct">…</span>). Homes sold without
-              a listing, often new construction, are not represented, so coverage is shown beside each figure.</p>
+            <p>Measured from the <strong>listing date to the contract date</strong>, consistent with industry practice,
+              rather than to the closing date. Sales missing either date are excluded rather than counted as zero, leaving
+              <strong data-stat="m-dom">…</strong> sales (<span data-stat="m-dom-pct">…</span>). Homes sold without a public
+              listing, often new construction, are therefore not represented, and coverage is reported alongside each
+              figure.</p>
           </article>
           <article class="method">
             <h3>Identifiers and duplicates</h3>
-            <p><code>listing_id</code> is the unique key (<span data-stat="m-ids">…</span> unique ids for
-              <span data-stat="m-total">…</span> rows). Nothing is deduplicated by street address: separate condo units
-              in one building share an address and are distinct sales. ZIP codes are read as text.</p>
+            <p>Each sale carries a unique listing identifier (<span data-stat="m-ids">…</span> identifiers for
+              <span data-stat="m-total">…</span> sales). Sales are not combined by street address: separate condominium
+              units in the same building can share an address and are counted as distinct sales.</p>
           </article>
           <article class="method">
             <h3>Property type</h3>
-            <p>The source's <code>home_type</code> field labels nearly every row single family, including condo units,
-              so it is not used anywhere on this site.</p>
+            <p>The source's property-type field classifies nearly every sale as single-family, including condominium
+              units, so it is not used in any comparison.</p>
           </article>
           <article class="method">
             <h3>Campus areas</h3>
-            <p>Each sale belongs to the nearest of 11 campus landmarks, by its own coordinates.
-              <code>miles_to_campus</code> is straight-line distance. Champaign, Urbana and Savoy make up the University
-              of Illinois area.</p>
+            <p>Each sale is assigned to the nearest of 11 campus landmarks based on the property's coordinates, and
+              distance to campus is measured in a straight line. Champaign, Urbana and Savoy make up the University of
+              Illinois area.</p>
           </article>
         </div>
 
@@ -380,9 +385,9 @@
           <h3>Data source and citation</h3>
           <p>College-town home sales dataset, version 1.0 (2026). University of Illinois-Deloitte Foundation Center for
             Business Emerging Technologies. Data collected March 2026.</p>
-          <p class="muted">Values are as reported by the collection source and have not been verified against county
-            records. See the project's <a href="https://github.com/bradschalk06-sketch/campustown-home-sales#readme">README</a>
-            for the full methodology and independent checks of the figures.</p>
+          <p class="muted">Values are as reported by the collection source and have not been independently verified
+            against county records. Detailed <a href="https://github.com/bradschalk06-sketch/campustown-home-sales#readme">methodology
+            notes</a>, including independent checks of key figures, accompany the published data.</p>
         </div>
       </div>
     </section>
@@ -390,9 +395,9 @@
 
   <footer class="footer">
     <div class="wrap footer-inner">
-      <p><strong>Campus Housing Explorer</strong> · A college-town housing market dashboard</p>
-      <p class="muted">Data: College-town home sales dataset v1.0 (2026), UIDFC Center for Business Emerging Technologies.
-        Charts: Chart.js. CSV parsing: Papa Parse.</p>
+      <p><strong>Campus Housing Explorer</strong> · Housing market research for U.S. college towns</p>
+      <p class="muted">Source: College-town home sales dataset, version 1.0 (2026), University of Illinois-Deloitte Foundation
+        Center for Business Emerging Technologies.</p>
     </div>
   </footer>
 
