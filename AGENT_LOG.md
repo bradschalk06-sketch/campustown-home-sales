@@ -50,3 +50,11 @@ Copy this outline for each entry:
   - On phones, the explorer table needed sideways scrolling. Rows now turn into cards on narrow screens.
   - The day-range labels on the days-on-market chart were tilted and hard to read. They were shortened.
   - The short-money formatter would have shown $10,000,000 as "$1M". It was fixed before release, although no sale in the analysis set goes above $5M.
+
+2026-11-17: Final website review and deployment
+
+Asked: I asked Claude to build an interactive housing-market dashboard using the college-town home sales dataset and publish the changes through GitHub.
+
+Agent produced: Claude created the Campus Housing Explorer dashboard, including market statistics, university comparisons, a Champaign–Urbana spotlight, a property explorer, and documentation.
+
+Checked or changed: I reviewed the completed dashboard, merged Pull Request #1 into the main branch, enabled GitHub Pages, and opened the published website to verify that the dashboard loaded correctly. I also added the public website URL to the repository's About section. Earlier, I caught that Claude was attempting to connect to the professor's starter repository rather than my own and redirected it to the correct repository.
