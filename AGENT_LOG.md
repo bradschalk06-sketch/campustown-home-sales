@@ -58,3 +58,17 @@ Asked: I asked Claude to build an interactive housing-market dashboard using the
 Agent produced: Claude created the Campus Housing Explorer dashboard, including market statistics, university comparisons, a Champaign–Urbana spotlight, a property explorer, and documentation.
 
 Checked or changed: I reviewed the completed dashboard, merged Pull Request #1 into the main branch, enabled GitHub Pages, and opened the published website to verify that the dashboard loaded correctly. I also added the public website URL to the repository's About section. Earlier, I caught that Claude was attempting to connect to the professor's starter repository rather than my own and redirected it to the correct repository.
+
+## 2026-11-17: Editorial revision of the website's wording
+
+- **Asked:** "Please revise the wording throughout the Campus Housing Explorer website to ensure it reads like a professional, public-facing real estate analytics platform. Most importantly, the website should speak to its visitors, not to me as the person who commissioned or developed it." The prompt also gave eight guidelines: a neutral third-person editorial voice; no references to coding or the development process; no direct address such as "your browser"; writing for a general audience; a concise Methodology without file names or scripts; keeping every figure, threshold and caveat, and describing the $10,000–$5,000,000 range as an analytical filtering choice rather than proof that excluded sales are invalid; reviewing headings, captions, tooltips, filters and the Property Explorer; and keeping the six Methodology cards and the design. It ended: "Do not change any calculations, underlying data, charts, interactive functionality, layout, or styling. This is strictly an editorial revision."
+- **Agent produced:** Text-only edits to `index.html` and to the display strings in `js/app.js`:
+  - The Methodology was rewritten as "About the data and methods," with no file names, column names or code. It explains why medians are used, and the six cards are kept.
+  - "Price rule" became "Price range." It is described as an analytical choice that "does not imply that the excluded transactions are invalid."
+  - "Outside price rule" became "Outside analysis range" in the KPI notes, the explorer tag, the explorer summary and the checkbox.
+  - Instructions such as "Hover a bar," "Click a column heading," "Search…" and "Try widening…" were rewritten in a neutral voice. The "DOM coverage" heading was spelled out.
+  - The footer no longer credits programming libraries. Their licenses remain in `vendor/`.
+- **Checked:**
+  - The page was reloaded at desktop and phone widths with no errors.
+  - Every KPI, the university scorecard, the Champaign–Urbana cards, the Methodology counts and the explorer test (159 sales) show the same values as before the revision.
+  - `git diff` shows only text changes, with no changes to calculations, data, CSS or layout.
